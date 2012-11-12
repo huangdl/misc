@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<!-- Data Source -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+	        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+        	<property name="url" value="jdbc:oracle:thin:@samsara.sourcemedia.com:1521:snap3"/>
+		<property name="username" value="dhuang" />
+		<property name="password" value="delai" />
+		<property name="initialSize" value="5" />
+		<property name="maxActive" value="10" />
+	</bean>
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="instDao" class="com.accuity.des.dao.jdbc.InstDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+	<bean id="refDao" class="com.accuity.des.dao.jdbc.RefDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	</bean>
+
+ 	<!-- Domain -->
+ 	<bean id="login" class="com.accuity.des.domain.Login" scope="prototype"/>
+ 	<bean id="inst" class="com.accuity.des.domain.Inst" scope="prototype"/>
+ 	<bean id="instDetail" class="com.accuity.des.domain.InstDetail" scope="prototype"/>
+ 	<bean id="instService" class="com.accuity.des.web.InstService" scope="prototype"/>
+
+	<!-- Validator -->
+	<bean id="loginValidator" class="com.accuity.des.web.LoginValidator">
+		<property name="refDao" ref="refDao" />
+	</bean>
+	<bean id="instSearchValidator" class="com.accuity.des.web.InstSearchValidator"/>
+	<bean id="instDetailValidator" class="com.accuity.des.web.InstDetailValidator"/>
+
+	<!-- Controller -->
+	<bean name="/login.htm" class="com.accuity.des.action.LoginController">
+    		<property name="login" ref="login"/>
+    		<property name="validator" ref="loginValidator"/>
+    		<property name="formView" value="login"/>
+    		<property name="successView" value="main.htm"/>
+    		<property name="commandName" value="login"/>
+    		<property name="commandClass" value="com.accuity.des.domain.Login"/>
+	</bean>
+	<bean name="/main.htm" class="com.accuity.des.action.MainController"/>
+	<bean name="/instSearch.htm" class="com.accuity.des.action.InstSearchController">
+    		<property name="instDao" ref="instDao" />
+    		<property name="refDao" ref="refDao" />
+    		<property name="validator" ref="instSearchValidator"/>
+    		<property name="formView" value="instSearch"/>
+    		<property name="successView" value="instSearch"/>
+    		<property name="commandName" value="inst"/>
+    		<property name="commandClass" value="com.accuity.des.domain.Inst"/>
+	</bean>
+	<bean name="/instDetail.htm" class="com.accuity.des.action.InstDetailController">
+    		<property name="instDao" ref="instDao" />
+    		<property name="refDao" ref="refDao" />
+    		<property name="validator" ref="instDetailValidator"/>
+    		<property name="formView" value="instDetail"/>
+    		<property name="successView" value="instDetail"/>
+    		<property name="commandName" value="instDetail"/>
+    		<property name="commandClass" value="com.accuity.des.domain.InstDetail"/>
+	</bean>
+	<bean name="/feedback.htm" class="com.accuity.des.action.FeedbackController">
+    		<property name="refDao" ref="refDao" />
+    		<property name="formView" value="feedback"/>
+    		<property name="successView" value="feedback"/>
+    		<property name="commandName" value="feedback"/>
+    		<property name="commandClass" value="com.accuity.des.domain.Feedback"/>
+	</bean>
+<!--
+	<bean id="urlMapping" class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping"/>
+
+	<bean id="loginController" class="com.accuity.des.action.LoginController">
+    		<property name="login" ref="login"/>
+    		<property name="validator" ref="loginValidator"/>
+    		<property name="formView" value="login"/>
+    		<property name="successView" value="main.htm"/>
+    		<property name="commandName" value="login"/>
+    		<property name="commandClass" value="com.accuity.des.domain.Login"/>
+	</bean>
+	<bean id="mainController" class="com.accuity.des.action.MainController"/>
+	<bean id="instController" class="com.accuity.des.action.InstSearchController">
+    		<property name="instDao" ref="instDao" />
+    		<property name="validator" ref="instSearchValidator"/>
+    		<property name="formView" value="inst"/>
+    		<property name="successView" value="inst.htm"/>
+    		<property name="commandName" value="inst"/>
+    		<property name="commandClass" value="com.accuity.des.domain.Inst"/>
+	</bean>
+	<bean id="instDetailController" class="com.accuity.des.action.InstDetailController">
+    		<property name="instDao" ref="instDao" />
+    		<property name="validator" ref="instDetailValidator"/>
+    		<property name="formView" value="instDetail"/>
+    		<property name="successView" value="instDetail.htm"/>
+    		<property name="commandName" value="instDetail"/>
+    		<property name="commandClass" value="com.accuity.des.domain.InstDetail"/>
+	</bean>
+-->
+
+	<!-- view resolver -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+      		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+      		<property name="prefix" value="/WEB-INF/jsp/"/>
+      		<property name="suffix" value=".jsp"/>
+	</bean>
+</beans>
